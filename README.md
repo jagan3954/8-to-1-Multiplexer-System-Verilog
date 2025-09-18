@@ -90,31 +90,60 @@ A **Multiplexer (MUX)** is a combinational logic circuit that selects one of sev
 ## SystemVerilog Code  
 
 ### Multiplexer Design (`mux8to1.sv`)
+
 ```systemverilog
-module mux8to1 (
-    input  logic [7:0] D,       // Data inputs
-    input  logic [2:0] Sel,     // Select lines
-    output logic Y              // Output
+// 8:1 Multiplexer using case statement 
+module mux8to1_case (
+  input  logic [7:0] d,   // 8 data inputs
+  input  logic [2:0] sel, // 3-bit select line
+  output logic       y    // single output
 );
 
-    // Write code here using case statement or conditional operator
+  // RTL description using case
+  always_comb begin
+    case (sel)
+      3'b000: y = d[0];
+      3'b001: y = d[1];
+      3'b010: y = d[2];
+      3'b011: y = d[3];
+      3'b100: y = d[4];
+      3'b101: y = d[5];
+      3'b110: y = d[6];
+      3'b111: y = d[7];
+      default: y = 1'b0;   // safe default assignment
+    endcase
+  end
 
 endmodule
 
 ```
 ### Testbench code (`mux8to1_tb.sv`)
+
 ```systemverilog
-module mux8to1_tb;
+module tb_mux8to1_case;
 
-    // Declare testbench signals here
+  logic [7:0] d;
+  logic [2:0] sel;
+  logic y;
 
-    // Instantiate the DUT (Design Under Test)
+  // Instantiate DUT
+  mux8to1_case uut (d, sel, y);
 
-    // Apply stimulus to inputs
+  initial begin
+    // Apply test patterns
+    d = 8'b10101010; // alternate 1s and 0s
 
-    // Monitor outputs
+    $display("Time | Sel | Output");
+    for (int i = 0; i < 8; i++) begin
+      sel = i;
+      #10;
+      $display("%0t   | %0d   | %0b", $time, sel, y);
+    end
 
+    $finish;
+  end
 endmodule
+
 ```
 
 ---
@@ -125,8 +154,7 @@ The simulation is carried out using ModelSim 2020.1.
 
 Waveforms will display the selected input line being passed to the output according to the select signals.
 
-(Insert waveform screenshot after running simulation in ModelSim)
-
+<img width="1918" height="1078" alt="Screenshot 2025-09-16 092944" src="https://github.com/user-attachments/assets/fb943a53-f22c-4178-b629-5bfc77f1c8db" />
 
 ---
 
